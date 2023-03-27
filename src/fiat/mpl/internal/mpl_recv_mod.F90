@@ -79,9 +79,11 @@ IMPLICIT NONE
 #include "mpl_recv_mod.intf.h"
 #undef SUBNAME
 
+#ifdef _CUDA
 #define SUBNAME(NAME) NAME##_DEVICE
 #include "mpl_recv_mod.intf.h"
 #undef SUBNAME
+#endif
 
 PRIVATE
 
@@ -189,10 +191,12 @@ END SUBROUTINE MPL_RECV_TAIL
 #undef SUBNAME
 #undef _ATTR_
 
+#ifdef _CUDA
 #define SUBNAME(NAME) NAME##_DEVICE
 #define _ATTR_ ,DEVICE
 #include "mpl_recv_mod.body.h"
 #undef SUBNAME
 #undef _ATTR_
+#endif
 
 END MODULE MPL_RECV_MOD

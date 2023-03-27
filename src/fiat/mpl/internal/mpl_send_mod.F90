@@ -79,9 +79,11 @@ IMPLICIT NONE
 #include "mpl_send_mod.intf.h"
 #undef SUBNAME
 
+#ifdef _CUDA
 #define SUBNAME(NAME) NAME##_DEVICE
 #include "mpl_send_mod.intf.h"
 #undef SUBNAME
+#endif
 
 
 PRIVATE
@@ -100,10 +102,12 @@ CONTAINS
 #undef SUBNAME
 #undef _ATTR_
 
+#ifdef _CUDA
 #define SUBNAME(NAME) NAME##_DEVICE
 #define _ATTR_ ,DEVICE
 #include "mpl_send_mod.body.h"
 #undef SUBNAME
 #undef _ATTR_
+#endif
 
 END MODULE MPL_SEND_MOD
