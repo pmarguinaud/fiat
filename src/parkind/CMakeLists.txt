@@ -10,7 +10,7 @@ set( HAVE_dp ${HAVE_DOUBLE_PRECISION} )
 set( HAVE_sp ${HAVE_SINGLE_PRECISION} )
 
 foreach( prec sp dp )
-#  if( HAVE_${prec} )
+  if( HAVE_${prec} )
  
   ecbuild_add_library(
     TARGET  parkind_${prec}
@@ -34,7 +34,7 @@ foreach( prec sp dp )
 
   endif()
   
-#  endif()
+  endif()
 endforeach()
 
 
