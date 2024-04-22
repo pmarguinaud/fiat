@@ -65,6 +65,25 @@ if(CMAKE_C_COMPILER_ID STREQUAL "PGI" OR CMAKE_C_COMPILER_ID STREQUAL "NVHPC" )
  find_library(NVTOOLSEXT_LIB NAMES nvToolsExt  REQUIRED HINTS ${CUDAToolkit_LIBRARY_DIR})
  find_library(NVHPCWRAPNVTX_LIB NAMES nvhpcwrapnvtx  REQUIRED HINTS  ${NVHPC_HOSTUTILS_LIBRARY_DIR} )
 
+  ecbuild_find_package(OpenACC REQUIRED)
+  ecbuild_add_option( FEATURE ACC  
+                      REQUIRED_PACKAGES "OpenACC COMPONENTS Fortran" 
+                      DEFAULT ON )
+  
+  enable_language( CUDA )
+  ecbuild_find_package(CUDAToolkit REQUIRED)
+  ecbuild_add_option( FEATURE GPU
+                      DEFAULT ON
+                      DESCRIPTION "Compile GPU version of fiat" )
+  
+  set( OpenACC_Fortran_FLAGS "-acc" )
+  set( OpenACC_Fortran_FLAGS "${OpenACC_Fortran_FLAGS} -ta=tesla:lineinfo,deepcopy,fastmath" )
+  set( OpenACC_Fortran_FLAGS "${OpenACC_Fortran_FLAGS} -Mcuda" )
+  
+  get_filename_component (CUDALIB ${CUDA_cublas_LIBRARY} DIRECTORY)
+  set (CMAKE_Fortran_FLAGS_RELWITHDEBINFO "${CMAKE_Fortran_FLAGS_RELWITHDEBINFO} ${OpenACC_Fortran_FLAGS} -L${CUDALIB} -Wl,-rpath,${CUDALIB}")
+  set (CMAKE_Fortran_FLAGS_RELWITHDEBINFO_INIT "${CMAKE_Fortran_FLAGS_RELWITHDEBINFO_INIT} ${OpenACC_Fortran_FLAGS} -L${CUDALIB} -Wl,-rpath,${CUDALIB}")
+
 endif()
  
 
