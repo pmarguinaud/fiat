@@ -177,6 +177,89 @@ void linux_bind_ (int * prank, int * psize)
   free (buf);
 }
 
+void linux_bind1_ (int * prank, int * psize)
+{
+  int rank = *prank;
+  int size = *psize;
+  FILE * fp; 
+  int i;
+  size_t len  = 256;
+  char * buf = (char*)malloc (len);
+  const char * EC_LINUX_BIND;
+
+  EC_LINUX_BIND = getenv ("EC_LINUX_BIND");
+
+  if (EC_LINUX_BIND == NULL)
+    EC_LINUX_BIND = LINUX_BIND_TXT;
+
+  fp = fopen (EC_LINUX_BIND, "r");
+
+  if (fp == NULL)
+    {   
+      // Willem Deconinck: Comment out as this pollutes logs
+      // fprintf (stderr, "`%s' was not found\n", EC_LINUX_BIND);
+      goto end;
+    }   
+
+  for (i = 0; i < rank+1; i++)
+    {   
+      if (getline (&buf, &len, fp) == -1) 
+        {
+          fprintf (stderr, "Unexpected EOF while reading `" LINUX_BIND_TXT "'\n");
+          goto end;
+        }
+    }   
+
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+  {
+    char * c;
+    cpu_set_t mask;
+    int iomp =
+#ifdef _OPENMP
+      omp_get_thread_num ()
+#else
+      1   
+#endif
+    ;   
+    int jomp, icpu;
+
+    for (jomp = 0, c = buf; jomp < iomp; jomp++)
+      {   
+        while (*c && isdigit (*c))
+          c++;
+        while (*c && (! isdigit (*c)))
+          c++;
+        if (*c == '\0')
+          {
+            fprintf (stderr, "Unexpected end of line while reading `" LINUX_BIND_TXT "'\n");
+            goto end_parallel;
+          }
+      }   
+
+    CPU_ZERO (&mask);
+
+    for (icpu = 0; isdigit (*c); icpu++, c++)
+      if (*c != '0')
+        CPU_SET (icpu, &mask);
+
+    sched_setaffinity (0, sizeof (mask), &mask);
+
+end_parallel:
+
+    c = NULL;
+
+  }
+
+end:
+
+  if (fp != NULL)
+    fclose (fp);
+
+  free (buf);
+}
+
 #else
 
 void linux_bind_ () { }

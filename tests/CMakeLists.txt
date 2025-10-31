@@ -284,6 +284,25 @@ add_test(NAME fiat_test_namelist
       -P ${CMAKE_CURRENT_SOURCE_DIR}/test_program_output.cmake )
 
 # ----------------------------------------------------------------------------------------
+# Tests: fiat_test_linux_bind
+#   
+
+ecbuild_add_executable(
+    TARGET  fiat-test-linux_bind
+    SOURCES fiat-test-linux_bind.c
+    LIBS    fiat  OpenMP::OpenMP_C
+    LINKER_LANGUAGE C
+    NOINSTALL )
+
+if( HAVE_MPI )
+    target_include_directories( fiat-test-linux_bind PRIVATE ${MPI_Fortran_INCLUDE_DIRS} )
+endif ()
+
+configure_file (fiat-test-linux_bind.pl ${CMAKE_CURRENT_BINARY_DIR}/fiat-test-linux_bind.pl COPYONLY)
+configure_file (fiat-test-linux_bind.sh ${CMAKE_CURRENT_BINARY_DIR}/fiat-test-linux_bind.sh COPYONLY)
+
+
+# ----------------------------------------------------------------------------------------
 # Test installation of fiat is working
 
 configure_file( test-install.sh.in ${CMAKE_CURRENT_BINARY_DIR}/test-install.sh @ONLY )
