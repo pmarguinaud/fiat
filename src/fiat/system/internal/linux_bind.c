@@ -22,6 +22,7 @@
 #include <sched.h>
 
 #include "oml.h"
+#include <omp.h>
 
 static char * getcpumask (char *buffer, size_t size)
 {
@@ -210,18 +211,12 @@ void linux_bind1_ (int * prank, int * psize)
         }
     }   
 
-#ifdef _OPENMP
 #pragma omp parallel
-#endif
   {
     char * c;
     cpu_set_t mask;
     int iomp =
-#ifdef _OPENMP
       omp_get_thread_num ()
-#else
-      1   
-#endif
     ;   
     int jomp, icpu;
 

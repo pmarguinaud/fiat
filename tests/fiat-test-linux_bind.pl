@@ -145,10 +145,12 @@ sub bind_node
 }
 
 
+my $ncpus = shift;
+
 my $cpuinfo = 
 {
-  nthreadpercore =>   1,
-  ncpus          => 128,
+  nthreadpercore =>      1,
+  ncpus          => $ncpus,
 };
 
 
