@@ -14,6 +14,7 @@
 #define _DRHOOK_FILE_ "drhook.c"
 
 #define _GNU_SOURCE
+#define __USE_GNU
 
 /* 
    drhook.c

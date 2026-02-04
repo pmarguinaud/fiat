@@ -19,6 +19,7 @@
 
 //if (defined(__GNUC__) || defined(__PGI))
 #define _GNU_SOURCE
+#define __USE_GNU
 //endif
 
 #if defined(__APPLE__)
