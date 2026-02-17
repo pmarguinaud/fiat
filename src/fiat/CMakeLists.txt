@@ -67,6 +67,7 @@ ecbuild_add_library( TARGET fiat
         ${CMAKE_CURRENT_SOURCE_DIR}/ecsort/internal
         ${CMAKE_CURRENT_SOURCE_DIR}/util/internal
         ${CMAKE_CURRENT_SOURCE_DIR}/system/internal
+        ${CMAKE_CURRENT_SOURCE_DIR}/heap/internal
     PUBLIC_INCLUDES
         $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/src>
         $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
