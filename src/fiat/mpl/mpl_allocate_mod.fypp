@@ -1,7 +1,7 @@
 MODULE MPL_ALLOCATE_MOD
 
 USE EC_PARKIND, ONLY : JPIM, JPIB, JPRM, JPRD
-USE ISO_C_BINDING, ONLY : C_PTR, C_SIZE_T, C_LOC, C_F_POINTER
+USE ISO_C_BINDING, ONLY : C_PTR, C_SIZE_T, C_LOC, C_F_POINTER, C_ASSOCIATED, C_NULL_PTR
 
 IMPLICIT NONE
 
@@ -27,7 +27,7 @@ END INTERFACE
 
 PRIVATE
 
-TYPE (C_PTR), SAVE :: MPL_ALLOCATE_HEAP
+TYPE (C_PTR), SAVE :: MPL_ALLOCATE_HEAP = C_NULL_PTR
 
 PUBLIC :: MPL_ALLOCATE, MPL_DEALLOCATE, MPL_ALLOCATE_INIT
 
@@ -69,7 +69,10 @@ ILBOUNDS = 1
 
 IF (PRESENT (LBOUNDS)) ILBOUNDS = LBOUNDS
 
-! ALLOCATE (P (${','.join (map (lambda i: "ILBOUNDS(" + str (i) + "):UBOUNDS (" + str (i) + ")", range (1, rank+1)))}$))
+IF (.NOT. C_ASSOCIATED (MPL_ALLOCATE_HEAP)) THEN
+  ALLOCATE (P (${','.join (map (lambda i: "ILBOUNDS(" + str (i) + "):UBOUNDS (" + str (i) + ")", range (1, rank+1)))}$))
+  RETURN
+ENDIF
 
 ISIZE = INT (KIND (P), C_SIZE_T)
 #:for i in range (1, rank+1, 1)
@@ -90,7 +93,11 @@ ${type}$ (KIND=JP${kind}$), POINTER :: P (${ ','.join ([':'] * rank) }$)
 
 TYPE (C_PTR) :: PTR
 
-! DEALLOCATE (P)
+IF (.NOT. C_ASSOCIATED (MPL_ALLOCATE_HEAP)) THEN
+  DEALLOCATE (P)
+  P => NULL ()
+  RETURN
+ENDIF
 
 PTR = C_LOC (P (${ ', '.join (map (lambda i: 'LBOUND (P, ' + str (i) + ')', range (1, rank+1))) }$))
 
