@@ -52,6 +52,7 @@ USE EC_PARKIND  ,ONLY : JPIM
 
 USE MPL_DATA_MODULE
 USE MPL_MESSAGE_MOD
+USE MPL_HEAP_MOD, ONLY : MPL_HEAP
 
 IMPLICIT NONE
 
@@ -78,6 +79,8 @@ LOGICAL                      :: LLMEMINFO
 LOGICAL,parameter            :: LLABORT=.TRUE.
 
 #include "ec_mpi_finalize.intfb.h"
+
+CALL MPL_HEAP%FINAL
 
 IF(MPL_NUMPROC < 1) THEN
   IF(MPL_NUMPROC == -1) THEN

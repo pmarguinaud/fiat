@@ -13,27 +13,40 @@
 #include <stdlib.h>
 #include <string.h>
 
+namespace
+{
+
+#define BUDDY_CPP_MANGLED
 #define BUDDY_ALLOC_IMPLEMENTATION
 #include "buddy_alloc.h"
 #undef BUDDY_ALLOC_IMPLEMENTATION
 
+}
+
 typedef struct
 {
-  void * metadata;
-  void * arena;
+  unsigned char * metadata;
+  unsigned char * arena;
   struct buddy * buddy;
+  size_t size;
 } fiat_heap_t;
+
+extern "C" 
+{
 
 void fiat_heap_new (fiat_heap_t ** heap, size_t size)
 {
   *heap = (fiat_heap_t *)malloc (sizeof (fiat_heap_t));
-  (*heap)->metadata = malloc (buddy_sizeof (size));
-  (*heap)->arena    = malloc (size);
+  (*heap)->metadata = (unsigned char *)malloc (buddy_sizeof (size));
+  (*heap)->arena    = (unsigned char *)malloc (size);
   (*heap)->buddy    = buddy_init ((*heap)->metadata, (*heap)->arena, size);
+  (*heap)->size     = size;
 }
 
 void fiat_heap_delete (fiat_heap_t * heap)
 {
+  if (heap == NULL)
+    return;
   if (heap->metadata)
     free (heap->metadata); 
   heap->metadata = NULL;
@@ -53,6 +66,15 @@ void fiat_heap_allocate (fiat_heap_t * heap, size_t size, void ** ptr)
 
 void fiat_heap_deallocate (fiat_heap_t * heap, void * ptr)
 {
-  buddy_free (heap->buddy, ptr);
+  char * b = (char *)ptr, * u = b + heap->size;
+  if ((b <= ptr) && (ptr < u))
+    {
+      buddy_free (heap->buddy, ptr);  
+    }
+  else
+    {
+      abort ();
+    }
 }
 
+}
