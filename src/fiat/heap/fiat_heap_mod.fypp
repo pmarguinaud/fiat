@@ -149,6 +149,10 @@ ${type}$ (KIND=JP${kind}$), POINTER :: P (${ ','.join ([':'] * rank) }$)
 
 TYPE (C_PTR) :: PTR
 
+IF (.NOT. ASSOCIATED (P)) THEN
+  RETURN
+ENDIF
+
 IF (.NOT. C_ASSOCIATED (SELF%PTR)) THEN
   DEALLOCATE (P)
   P => NULL ()
