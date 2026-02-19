@@ -50,6 +50,10 @@ CONTAINS
 #:for type, kind in zip (types, kinds)
   PROCEDURE, PRIVATE :: FIAT_ALLOCATE_${rank}$${kind}$
   GENERIC :: ALLOCATE => FIAT_ALLOCATE_${rank}$${kind}$
+#:if rank == 1
+  PROCEDURE, PRIVATE :: FIAT_GROW_${rank}$${kind}$
+  GENERIC :: GROW => FIAT_GROW_${rank}$${kind}$
+#:endif
 #:endfor
 #:endfor
 #:for rank in ranks
@@ -118,6 +122,25 @@ CALL C_F_POINTER (PTR, P, UBOUNDS-ILBOUNDS+1)
 P (${ ', '.join (map (lambda i: 'ILBOUNDS (' + str (i) + '):', range (1, rank+1))) }$) => P
 
 END SUBROUTINE FIAT_ALLOCATE_${suffix}$
+
+#:if rank == 1
+SUBROUTINE FIAT_GROW_${suffix}$ (SELF, P, UBOUNDS)
+
+CLASS (FIAT_HEAP) :: SELF
+${type}$ (KIND=JP${kind}$), POINTER :: P (:)
+INTEGER (KIND=JPIM), INTENT (IN) :: UBOUNDS (1)
+
+IF (ASSOCIATED (P)) THEN
+  IF (UBOUNDS (1) <= SIZE (P)) THEN
+    RETURN
+  ENDIF
+ENDIF
+
+CALL SELF%DEALLOCATE (P)
+CALL SELF%ALLOCATE (P, UBOUNDS)
+
+END SUBROUTINE FIAT_GROW_${suffix}$
+#:endif
 
 SUBROUTINE FIAT_DEALLOCATE_${suffix}$ (SELF, P)
 
