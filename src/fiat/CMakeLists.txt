@@ -46,11 +46,11 @@ configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/library/version.c.in ${CMAKE_CURRENT
 
 ecbuild_list_add_pattern( LIST fiat_src GLOB *.c *.F* *.cc )
 
-add_custom_command (OUTPUT mpl_allocate_mod.F90
-  COMMAND ${FYPP} -m os ${CMAKE_CURRENT_SOURCE_DIR}/mpl/mpl_allocate_mod.fypp > mpl_allocate_mod.F90
-  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/mpl/mpl_allocate_mod.fypp VERBATIM)
+add_custom_command (OUTPUT fiat_heap_mod.F90
+  COMMAND ${FYPP} -m os ${CMAKE_CURRENT_SOURCE_DIR}/heap/fiat_heap_mod.fypp > fiat_heap_mod.F90
+  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/heap/fiat_heap_mod.fypp VERBATIM)
 
-list (APPEND fiat_src mpl_allocate_mod.F90)
+list (APPEND fiat_src fiat_heap_mod.F90)
 
 ecbuild_list_exclude_pattern( LIST fiat_src REGEX drhook/extensions/*)
 
