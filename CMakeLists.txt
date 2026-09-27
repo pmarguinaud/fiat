@@ -89,6 +89,25 @@ ecbuild_add_option( FEATURE DR_HOOK_NVTX
                     DESCRIPTION "Support for NVTX in DR_HOOK"
                     REQUIRED_PACKAGES NVTX )
 
+if(CMAKE_C_COMPILER_ID STREQUAL "PGI" OR CMAKE_C_COMPILER_ID STREQUAL "NVHPC" )
+    set (DEFAULT_GPU ON)
+else()
+    set (DEFAULT_GPU OFF)
+endif()
+ecbuild_add_option( FEATURE GPU
+                    DEFAULT ${DEFAULT_GPU}
+                    DESCRIPTION "Compile CUDA Fortran DEVICE-attribute variants of MPL_SEND/MPL_RECV (needs PGI/NVHPC)"
+                    REQUIRED_PACKAGES "OpenACC COMPONENTS Fortran" )
+
+if( HAVE_GPU )
+    enable_language( CUDA )
+    ecbuild_find_package( CUDAToolkit REQUIRED )
+
+    # -Mcuda enables CUDA Fortran and predefines _CUDA, which MPL_SEND/MPL_RECV use
+    # to generate the extra DEVICE-attribute overloads of their buffer arguments.
+    set( CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -acc -Mcuda" )
+endif()
+
 set (DEFAULT_DR_HOOK_ROCTX OFF)
 ecbuild_add_option( FEATURE DR_HOOK_ROCTX
                     DEFAULT ${DEFAULT_DR_HOOK_ROCTX}
