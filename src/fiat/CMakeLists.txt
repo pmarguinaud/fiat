@@ -193,6 +193,10 @@ foreach( LIB_TYPE ${LIB_TYPES} )
         target_link_libraries( ${fiatlib} PRIVATE OpenMP::OpenMP_Fortran )
     endif()
 
+    if( HAVE_GPU )
+        target_link_libraries( ${fiatlib} PRIVATE OpenACC::OpenACC_Fortran )
+    endif()
+
     fiat_target_ignore_missing_symbols( TARGET ${fiatlib} SYMBOLS
       _MallocExtension_GetNumericProperty
       _MPI_Get_version

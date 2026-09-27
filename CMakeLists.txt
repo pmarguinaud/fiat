@@ -94,19 +94,13 @@ if(CMAKE_C_COMPILER_ID STREQUAL "PGI" OR CMAKE_C_COMPILER_ID STREQUAL "NVHPC" )
 else()
     set (DEFAULT_GPU OFF)
 endif()
+# OpenACC_Fortran_FLAGS must enable CUDA Fortran (e.g. NVHPC's -cuda/-Mcuda), so that
+# _CUDA gets predefined and MPL_SEND/MPL_RECV generate their DEVICE-attribute overloads.
+# The flags are applied to the fiat target via OpenACC::OpenACC_Fortran (see src/fiat/CMakeLists.txt).
 ecbuild_add_option( FEATURE GPU
                     DEFAULT ${DEFAULT_GPU}
                     DESCRIPTION "Compile CUDA Fortran DEVICE-attribute variants of MPL_SEND/MPL_RECV (needs PGI/NVHPC)"
                     REQUIRED_PACKAGES "OpenACC COMPONENTS Fortran" )
-
-if( HAVE_GPU )
-    enable_language( CUDA )
-    ecbuild_find_package( CUDAToolkit REQUIRED )
-
-    # -Mcuda enables CUDA Fortran and predefines _CUDA, which MPL_SEND/MPL_RECV use
-    # to generate the extra DEVICE-attribute overloads of their buffer arguments.
-    set( CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -acc -Mcuda" )
-endif()
 
 set (DEFAULT_DR_HOOK_ROCTX OFF)
 ecbuild_add_option( FEATURE DR_HOOK_ROCTX
