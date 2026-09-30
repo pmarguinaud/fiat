@@ -195,6 +195,10 @@ foreach( LIB_TYPE ${LIB_TYPES} )
 
     if( HAVE_GPU )
         target_link_libraries( ${fiatlib} PRIVATE OpenACC::OpenACC_Fortran )
+        # FindOpenACC guards its link options with $<COMPILE_LANGUAGE:...>, which is
+        # always false at link time; propagate the flags to consumers explicitly.
+        separate_arguments( _fiat_acc_flags NATIVE_COMMAND "${OpenACC_Fortran_FLAGS}" )
+        target_link_options( ${fiatlib} INTERFACE ${_fiat_acc_flags} )
     endif()
 
     fiat_target_ignore_missing_symbols( TARGET ${fiatlib} SYMBOLS
